@@ -1,7 +1,7 @@
 module.exports = {
-  "env": {
-    "browser": true,
-    "es2021": true
+  'env': {
+    'browser': true,
+    'es2021': true,
   },
   "extends": [
     "eslint:recommended",
@@ -16,7 +16,9 @@ module.exports = {
     "sourceType": "module"
   },
   "plugins": [
-    "react"
+    "react",
+    "eslint-config-airbnb-base",
+    "eslint-plugin-import"
   ],
   "rules": {
     "no-underscore-dangle": ["error", { "allow": ["_id"] }]
