@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { handleError } = require('../utils/utils');
+const { handleError, handleIncorrectId, handleReqItemId } = require('../utils/utils');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -9,21 +9,8 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if (user === null) {
-        res.status(404).send({ message: `Пользователь отсутствует в базе` });
-        return
-      }
-            res.send(user)
-    })
-    .catch((err) => {
-      console.log(err.name);
-      if (req.params.userId.length !== 24) {
-        res.status(400).send({ message: `Введен некорректный ID пользователя` });
-        return
-      }
-      handleError(err, res)
-    });
+    .then((user) => handleReqItemId(user, res))
+    .catch((err) => handleIncorrectId('userId', err, req, res))
 };
 
 module.exports.createUser = (req, res) => {

@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { handleError } = require('../utils/utils');
+const { handleError, handleReqItemId, handleIncorrectId } = require('../utils/utils');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -16,20 +16,8 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (card === null) {
-        res.status(404).send({ message: `Карточка отсутствует в базе` });
-        return
-      }
-      res.send({ data: card })
-    })
-    .catch((err) => {
-      if (req.params.userId.length !== 24) {
-        res.status(400).send({ message: `Введен некорректный ID карточки` });
-        return
-      }
-      handleError(err, res)
-    });
+    .then((card) => handleReqItemId(card, res))
+    .catch((err) => handleIncorrectId('cardId', err, req, res));
 };
 
 module.exports.likeCard = (req, res) => {
@@ -38,8 +26,8 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => handleError(err, res));
+    .then((card) => handleReqItemId(card, res))
+    .catch((err) => handleIncorrectId('cardId', err, req, res));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -48,6 +36,6 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => handleError(err, res));
+    .then((card) => handleReqItemId(card, res))
+    .catch((err) => handleIncorrectId('cardId', err, req, res));
 };
