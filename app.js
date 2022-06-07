@@ -14,19 +14,27 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(bodyParser.json());
-app.use((req, res, next) => {
-  next(createError(404))
-})
+
 app.use((req, res, next) => {
   req.user = {
     _id: '629cc8283ee3bf44559a89e5'
   };
   next();
 });
+app.use(function(err, req, res, next) {
+  console.log(err.name);
+  if (err) {
+    console.log(err.name);
+    res.status(404).send({ message: `Некорректный путь к странице: ${err.message}` });
+    return;
+  }
+  next();
+});
+
 app.use('/', usersRoutes);
 app.use('/', cardsRoutes);
-app.use(function (err, req, res, next) {
-  res.status(404).send({ message: `Некорректный путь к странице: ${err.message}` });
+app.use(function(req, res, next) {
+  res.status(404).send({message: 'Невозможно отобразить страницу'});
 });
 
 app.listen(PORT, () => {
