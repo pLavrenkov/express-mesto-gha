@@ -8,10 +8,22 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  console.log(req.params.userId);
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .then((user) => {
+      if (user === null) {
+        res.status(404).send({ message: `Пользователь отсутствует в базе` });
+        return
+      }
+            res.send(user)
+    })
+    .catch((err) => {
+      console.log(err.name);
+      if (req.params.userId.length !== 24) {
+        res.status(400).send({ message: `Введен некорректный ID пользователя` });
+        return
+      }
+      handleError(err, res)
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -23,7 +35,14 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, {new: true, runValidators: true})
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .then((user) => res.send(user))
+    .catch((err) => handleError(err, res));
+};
+
+module.exports.updateAvatar = (req, res) => {
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => handleError(err, res));
 };

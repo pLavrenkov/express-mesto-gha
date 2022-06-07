@@ -1,28 +1,43 @@
-[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
+[![Tests for sprint 13](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-13-sprint.yml [![Tests for sprint 14](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-14-sprint.yml)
+
 # Проект Mesto фронтенд + бэкенд
 
+### Обзор
 
+Автор: **Павел Лавренков**
 
-## Настройка бейджей статуса тестов
-Перед началом работы над проектом рекомендуется исправить бейджи, отражающие статус прохождения тестов.
-Для этого замените разметку бейджей на следующий фрагмент, подставив вместо `${имя_пользователя}` и `${имя_репозитория}` соответствующие значения.
+Это учебный проект Яндекс.Практику по специальности **"Вэб-разработчик"**, **спринт 13**. Основная задача работы: создание бэкенда с присоединением к нему фронтенда.
 
-```
-[![Tests for sprint 13](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-13-sprint.yml) 
+Проект посвящен достопримечательностям России.
 
-[![Tests for sprint 14](https://github.com/pLavrenkov/express-mesto-gha.git/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/pLavrenkov/express-mesto-gha.git}/${имя репозитория}/actions/workflows/tests-14-sprint.yml)
-```
+В проект использованы следующие **технологии** веб-разработки:
 
+* в фронтенде использована библиотека **React** и хуки;
 
-## Директории
+* в бэкенде использван **Express**;
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
-  
-Остальные директории вспомогательные, создаются при необходимости разработчиком
+* hotreload севера для разработки с использованием пакета **nodemon**; 
 
-## Запуск проекта
+* в качестве базы данных используется **MongoDB**.
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+Реализована следующая функциональность:
+
+* прием запросов и их обработка по пользователям и карточкам;
+
+* обработка ошибок.
+
+Функционал к реализации:
+
+* авторизация пользователей.
+
+Фронтенд проекта использует медиа запросы со следующими точками перелома:
+
+* 1279px;
+
+* 1023px;
+
+* 767px.
+
+Максимальная ширина экрана: **1280px**.
+
+Проект будет размещен в **GitHab Pages** [здесь](https://plavrenkov.github.io/express-mesto-gha/).
