@@ -1,8 +1,4 @@
-module.exports.handleError = (id, err, req, res) => {
-  /* if (id in req.params && `req.params.${id}.length` !== 24) {
-    res.status(400).send({ message: `Введен некорректный ID объекта: ${err.message}` });
-    return;
-  } */
+module.exports.handleError = (err, req, res) => {
   if (err.name === 'ValidationError') {
     res.status(400).send({ message: `Введены некорректные данные: ${err.message}` });
     return;
