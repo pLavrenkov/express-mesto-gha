@@ -4,7 +4,7 @@ module.exports.handleError = (err, req, res) => {
     return;
   }
   if (err.name === 'CastError') {
-    res.status(400).send({ message: `Введены некорректные данные: ${err.message}` });
+    res.status(400).send({ message: `Данные не найдены: ${err.message}` });
     return;
   }
   res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
