@@ -21,8 +21,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', usersRoutes);
-app.use('/', cardsRoutes);
+app.use('/users', usersRoutes);
+app.use('/cards', cardsRoutes);
 app.use((req, res) => res.status(404).send({ message: 'Невозможно отобразить страницу' }));
 
 app.listen(PORT);

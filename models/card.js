@@ -3,18 +3,18 @@ const mongoose = require('mongoose');
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, 'Не заполнено название карточки'],
+    minlength: [2, 'Длина имени пользователя должна быть не менее 2х символов'],
+    maxlength: [30, 'Длина имени пользователя должна быть не более 30ти символов'],
   },
   link: {
     type: String,
-    required: true,
+    required: [true, 'Не заполнен url карточки'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true,
+    required: [true, 'Отсутствует ID создателя карточки'],
   },
   likes: {
     type: Array,
