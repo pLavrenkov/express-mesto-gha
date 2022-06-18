@@ -4,30 +4,41 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { handleError, handleReqItemId } = require('../utils/utils');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => handleError(err, req, res));
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => handleReqItemId(user, res))
-    .catch((err) => handleError(err, req, res));
+    .then((user) => handleReqItemId(user, res, next))
+    .catch((err) => {
+      if (err.errorCode === 404) {
+        next(err);
+      }
+      err.message = 'некорректный id пользователя';
+      err.errorCode = 400;
+      next(err);
+    });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isEmail(email)) {
-    res.status(400).send({ message: 'Email введен некорректно' });
+  if (!validator.isEmail(email) || !password) {
+    const err = new Error('email или пароль введен некорректно');
+    err.errorCode = 400;
+    next(err);
     return;
   }
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        res.status(409).send({ message: `Пользователь с таким email: ${email}, уже существует` });
+        const err = new Error(`пользователь с таким email: ${email}, уже существует`);
+        err.errorCode = 409;
+        next(err);
         return;
       }
       bcrypt.hash(password, 10)
@@ -36,29 +47,45 @@ module.exports.createUser = (req, res) => {
             name, about, avatar, email, password: hash,
           })
             .then((newuser) => res.send({ user: newuser }))
-            .catch((err) => handleError(err, req, res));
+            .catch((err) => {
+              err.errorCode = 400;
+              next(err);
+            });
         })
-        .catch((err) => handleError(err, req, res));
+        .catch(next);
     })
-    .catch((err) => handleError(err, req, res));
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
-    .catch((err) => handleError(err, req, res));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        err.errorCode = 400;
+        next(err);
+      }
+      next(err);
+    });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
-    .catch((err) => handleError(err, req, res));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        err.errorCode = 400;
+        next(err);
+      }
+      next(err);
+    });
 };
 
-module.exports.login = (req, res) => {
-  const { email, password } = req.body;
+module.exports.login = (req, res, next) => {
+  const { password } = req.body;
+  const email = req.body.email.toLowerCase();
   if (!email || !password) {
     res.status(400).send({ message: 'Не заполнены email или пароль' });
     return;
@@ -67,20 +94,11 @@ module.exports.login = (req, res) => {
     res.status(400).send({ message: 'Email введен некорректно' });
     return;
   }
-  User.findOne({ email })
+  User.findUserByCredentials(res, next, email, password)
     .then((user) => {
-      if (!user) {
-        res.status(401).send({ message: 'Пользователь не найден, неверные почта или пароль' });
-        return;
+      if (user) {
+        res.status(201).send({ user });
       }
-      bcrypt.compare(password, user.password);
     })
-    .then((matched) => {
-      if (!matched) {
-        res.status(401).send({ message: 'Пользователь не найден, неверные почта или пароль' });
-        return;
-      }
-      res.send({ message: 'Пользователь обранужен' });
-    })
-    .catch((err) => handleError(err, req, res));
+    .catch(next);
 };

@@ -10,9 +10,35 @@ module.exports.handleError = (err, req, res) => {
   res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
 };
 
-module.exports.handleReqItemId = (item, res) => {
+module.exports.handleCodeError = (err, res) => {
+  if (err.errorCode === 400) {
+    res.status(err.errorCode).send({ message: `Введены некорректные данные: ${err.message}` });
+    return;
+  }
+  if (err.errorCode === 401) {
+    res.status(401).send({ message: `Неверный логин или пароль: ${err.message}` });
+    return;
+  }
+  if (err.errorCode === 403) {
+    res.status(403).send({ message: `Неавторизованные действия: ${err.message}` });
+    return;
+  }
+  if (err.errorCode === 404) {
+    res.status(404).send({ message: `Данные не найдены: ${err.message}` });
+    return;
+  }
+  if (err.errorCode === 409) {
+    res.status(409).send({ message: `Пользователь уже зарегистрирован: ${err.message}` });
+    return;
+  }
+  res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
+};
+
+module.exports.handleReqItemId = (item, res, next) => {
   if (item === null) {
-    res.status(404).send({ message: 'Объект отсутствует в базе' });
+    const err = new Error('пользователь с такими параметрами отсутствует или удален');
+    err.errorCode = 404;
+    next(err);
     return;
   }
   res.send({ data: item });
