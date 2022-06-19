@@ -30,9 +30,9 @@ module.exports.deleteCard = (req, res, next) => {
       }
       Card.findByIdAndRemove(req.params.cardId)
         .then((card) => {
-           handleReqItemId(card, res, next);
-           res.send(card);
-          })
+          handleReqItemId(card, res, next);
+          res.send(card);
+        })
         .catch((err) => {
           err.message = 'некорректные данные о карточке';
           err.errorCode = 400;
@@ -55,7 +55,7 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => {
       handleReqItemId(card, res, next);
       res.send(card);
-     })
+    })
     .catch((err) => {
       err.message = 'некорректные данные о карточке';
       err.errorCode = 400;
@@ -70,9 +70,12 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      handleReqItemId(card, res, next);
-      res.send(card);
-     })
+      if (card === null) {
+        handleReqItemId(card, res, next);
+        return;
+      }
+      res.status(200).send(card);
+    })
     .catch((err) => {
       err.message = 'некорректные данные о карточке';
       err.errorCode = 400;
