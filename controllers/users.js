@@ -1,7 +1,9 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
+const { JWT_SECRET } = process.env;
 const User = require('../models/user');
 const { handleError, handleReqItemId } = require('../utils/utils');
 
@@ -50,7 +52,7 @@ module.exports.createUser = (req, res, next) => {
           User.create({
             name, about, avatar, email, password: hash,
           })
-            .then((newuser) => res.send({ user: newuser }))
+            .then((newuser) => res.status(201).send({ user: newuser }))
             .catch((err) => {
               err.errorCode = 400;
               next(err);
@@ -101,11 +103,18 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(res, next, email, password)
     .then((user) => {
       if (user) {
-        const token = jwt.sign({ _id: user._id }, 'secret-cat', { expiresIn: '7d' });
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
         console.log(token);
         res
           .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-          .status(201).send({ user });
+          .status(201).send({
+            "_id": user._id,
+            "name": user.name,
+            "about": user.about,
+            "avatar": user.avatar,
+            "email": user.email,
+            "__v": user.__v
+          });
       }
     })
     .catch(next);

@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const { JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   const cookies = req.cookies;
@@ -12,7 +15,8 @@ module.exports = (req, res, next) => {
   const token = cookies.jwt;
   let payload;
   try {
-    payload = jwt.verify(token, 'secret-cat');
+    console.log(process.env);
+    payload = jwt.verify(token, JWT_SECRET);
     console.log(payload);
   } catch (err) {
     err.errorCode = 401;

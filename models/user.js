@@ -30,11 +30,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Не заполнен пароль'],
     minlength: [2, 'Длина пароля должна быть не менее 2х символов'],
+    select: false,
   },
 });
 
 userSchema.statics.findUserByCredentials = function (res, next, email, password) {
   return this.findOne({ email })
+    .select('+password')
     .then((user) => {
       if (!user) {
         const err = new Error('неправильные почта или пароль');
