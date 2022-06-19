@@ -2,6 +2,20 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: [true, 'Не заполнен e-mail'],
+    minlength: [2, 'Длина email должна быть не менее 2х символов'],
+    maxlength: [30, 'Длина email должна быть не более 30ти символов'],
+    unique: [true, 'Пользователь с таким email уже есть'],
+    lowercase: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'Не заполнен пароль'],
+    minlength: [2, 'Длина пароля должна быть не менее 2х символов'],
+    select: false,
+  },
   name: {
     type: String,
     minlength: [2, 'Длина имени пользователя должна быть не менее 2х символов'],
@@ -20,20 +34,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     required: false,
-  },
-  email: {
-    type: String,
-    required: [true, 'Не заполнен e-mail'],
-    minlength: [2, 'Длина email должна быть не менее 2х символов'],
-    maxlength: [30, 'Длина email должна быть не более 30ти символов'],
-    unique: [true, 'Пользователь с таким email уже есть'],
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: [true, 'Не заполнен пароль'],
-    minlength: [2, 'Длина пароля должна быть не менее 2х символов'],
-    select: false,
   },
 });
 
