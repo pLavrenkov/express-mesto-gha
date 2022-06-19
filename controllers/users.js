@@ -103,11 +103,11 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(res, next, email, password)
     .then((user) => {
       if (user) {
-        const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ _id: user._id }, 'secret-cat', { expiresIn: '7d' });
         console.log(token);
         res
           .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-          .status(201).send({
+          .status(200).send({
             "_id": user._id,
             "name": user.name,
             "about": user.about,

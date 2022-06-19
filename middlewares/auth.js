@@ -15,8 +15,7 @@ module.exports = (req, res, next) => {
   const token = cookies.jwt;
   let payload;
   try {
-    console.log(process.env);
-    payload = jwt.verify(token, JWT_SECRET);
+    payload = jwt.verify(token, 'secret-cat');
     console.log(payload);
   } catch (err) {
     err.errorCode = 401;
