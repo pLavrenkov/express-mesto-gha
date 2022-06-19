@@ -16,7 +16,7 @@ module.exports.handleCodeError = (err, res) => {
     return;
   }
   if (err.errorCode === 401) {
-    res.status(401).send({ message: `Неверный логин или пароль: ${err.message}` });
+    res.status(401).send({ message: `Необходима авторизация: ${err.message}` });
     return;
   }
   if (err.errorCode === 403) {
@@ -31,15 +31,17 @@ module.exports.handleCodeError = (err, res) => {
     res.status(409).send({ message: `Пользователь уже зарегистрирован: ${err.message}` });
     return;
   }
+  console.log(err.name);
   res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
 };
 
 module.exports.handleReqItemId = (item, res, next) => {
   if (item === null) {
-    const err = new Error('пользователь с такими параметрами отсутствует или удален');
+    const err = new Error('объект с такими параметрами отсутствует или удален');
     err.errorCode = 404;
     next(err);
     return;
   }
-  res.send({ data: item });
+  return item;
+  //res.send({ data: item });
 };

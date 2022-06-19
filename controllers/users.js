@@ -1,5 +1,6 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const { handleError, handleReqItemId } = require('../utils/utils');
@@ -12,7 +13,10 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => handleReqItemId(user, res, next))
+    .then((user) => {
+      handleReqItemId(user, res, next);
+      res.send(user);
+    })
     .catch((err) => {
       if (err.errorCode === 404) {
         next(err);
@@ -27,7 +31,7 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isEmail(email) || !password) {
+  if (!validator.isEmail(email) || !password || !email) {
     const err = new Error('email или пароль введен некорректно');
     err.errorCode = 400;
     next(err);
@@ -97,7 +101,11 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(res, next, email, password)
     .then((user) => {
       if (user) {
-        res.status(201).send({ user });
+        const token = jwt.sign({ _id: user._id }, 'secret-cat', { expiresIn: '7d' });
+        console.log(token);
+        res
+          .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+          .status(201).send({ user });
       }
     })
     .catch(next);
