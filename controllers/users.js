@@ -29,6 +29,22 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      handleReqItemId(user, res, next);
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.errorCode === 404) {
+        next(err);
+      }
+      err.message = 'некорректный id пользователя';
+      err.errorCode = 400;
+      next(err);
+    });
+};
+
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,

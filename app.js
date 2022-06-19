@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const {errors} = require('celebrate');
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
 const {
@@ -37,6 +38,7 @@ app.use(auth);
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
 
+app.use(errors());
 app.use((err, _req, res, _next) => handleCodeError(err, res));
 app.use((_req, res) => res.status(404).send({ message: 'Невозможно отобразить страницу' }));
 
