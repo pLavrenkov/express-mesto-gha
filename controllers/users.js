@@ -33,9 +33,16 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isEmail(email) || !password || !email) {
+  if (!password || !email) {
     const err = new Error('email или пароль введен некорректно');
     err.errorCode = 400;
+    next(err);
+    return;
+  }
+  if (!validator.isEmail(email) || !password || !email) {
+    const err = new Error('email введен некорректно');
+    err.errorCode = 400;
+    console.log(err);
     next(err);
     return;
   }
@@ -58,9 +65,15 @@ module.exports.createUser = (req, res, next) => {
               next(err);
             });
         })
-        .catch(next);
+        .catch((err) => {
+          console.log('Обшибка: ' + err);
+          next(err);
+        });
     })
-    .catch(next);
+    .catch((err) => {
+      console.log('Обшибка: ' + err);
+      next(err);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -91,11 +104,11 @@ module.exports.updateAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { password } = req.body;
-  const email = req.body.email.toLowerCase();
-  if (!email || !password) {
+  if (!req.body.email || !req.body.password) {
     res.status(400).send({ message: 'Не заполнены email или пароль' });
     return;
   }
+  const email = req.body.email.toLowerCase();
   if (!validator.isEmail(email)) {
     res.status(400).send({ message: 'Email введен некорректно' });
     return;
