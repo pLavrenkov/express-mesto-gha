@@ -59,7 +59,14 @@ module.exports.createUser = (req, res, next) => {
           User.create({
             name, about, avatar, email, password: hash,
           })
-            .then((newuser) => res.status(201).send({ user: newuser }))
+            .then((newuser) => res.status(201).send({
+              "name": newuser.name,
+              "about": newuser.about,
+              "avatar": newuser.avatar,
+              "email": newuser.email,
+              "_id": newuser._id,
+              "__v": newuser.__v
+            }))
             .catch((err) => {
               err.errorCode = 400;
               next(err);
