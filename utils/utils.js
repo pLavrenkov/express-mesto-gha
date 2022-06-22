@@ -31,20 +31,18 @@ module.exports.handleCodeError = (err, res) => {
     res.status(409).send({ message: `Пользователь уже зарегистрирован: ${err.message}` });
     return;
   }
-  console.log(err.name);
   res.status(500).send({ message: `Произошла ошибка: ${err.message}` });
 };
 
 module.exports.handleReqItemId = (item, res, next) => {
-  if (item === null) {
-    const err = new Error('объект с такими параметрами отсутствует или удален');
-    err.errorCode = 404;
-    next(err);
-    return;
+  if (item !== null) {
+    return item;
   }
-  return item;
-  //res.send({ data: item });
+  const err = new Error('объект с такими параметрами отсутствует или удален');
+  err.errorCode = 404;
+  return next(err);
 };
 
-module.exports.urlRegExp = new RegExp('^(https?:\/\/)(w{3}\.)?([a-zA-Zа-яА-Я\-\d]{2,256}\.)([a-zA-Zа-яА-Я]{2,6})(\/[\s^\/]+)*(#$)?');
-//module.exports = urlRegExp;
+module.exports.urlRegExp = /^(https?:\/\/)(w{3}\\.)*([a-zA-Zа-яА-Я\-_\d]{2,256}\.)+([a-zA-Zа-яА-Я]{2,6})(\/?[\S]*)*?(#$)?/i;
+
+module.exports.JWT_SECRET = 'secret-cat';

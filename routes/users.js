@@ -4,13 +4,10 @@ const {
   getUsers,
   getUser,
   getCurrentUser,
-  createUser,
   updateUser,
   updateAvatar,
-  login,
 } = require('../controllers/users');
-const {urlRegExp} = require('../utils/utils');
-//const urlRegExp = new RegExp('^(https?:\/\/)(w{3}\.)?([a-zA-Zа-яА-Я\-\d]{2,256}\.)([a-zA-Zа-яА-Я]{2,6})(\/[\s^\/]+)*(#$)?');
+const { urlRegExp } = require('../utils/utils');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
@@ -28,7 +25,7 @@ router.patch('/me', celebrate({
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().pattern(urlRegExp),
-  })
+  }),
 }), updateAvatar);
 
 module.exports = router;

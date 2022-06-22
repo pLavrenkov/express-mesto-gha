@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { handleError, handleReqItemId } = require('../utils/utils');
+const { handleReqItemId } = require('../utils/utils');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -29,9 +29,9 @@ module.exports.deleteCard = (req, res, next) => {
         return;
       }
       Card.findByIdAndRemove(req.params.cardId)
-        .then((card) => {
-          handleReqItemId(card, res, next);
-          res.send(card);
+        .then((cardn) => {
+          handleReqItemId(cardn, res, next);
+          res.send(cardn);
         })
         .catch((err) => {
           err.message = 'некорректные данные о карточке';

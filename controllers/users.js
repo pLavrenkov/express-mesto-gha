@@ -3,9 +3,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET } = require('../utils/utils');
 const User = require('../models/user');
-const { handleError, handleReqItemId } = require('../utils/utils');
+const { handleReqItemId } = require('../utils/utils');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -58,7 +58,6 @@ module.exports.createUser = (req, res, next) => {
   if (!validator.isEmail(email) || !password || !email) {
     const err = new Error('email введен некорректно');
     err.errorCode = 400;
-    console.log(err);
     next(err);
     return;
   }
@@ -76,27 +75,20 @@ module.exports.createUser = (req, res, next) => {
             name, about, avatar, email, password: hash,
           })
             .then((newuser) => res.status(201).send({
-              "name": newuser.name,
-              "about": newuser.about,
-              "avatar": newuser.avatar,
-              "email": newuser.email,
-              "_id": newuser._id,
-              "__v": newuser.__v
+              name: newuser.name,
+              about: newuser.about,
+              avatar: newuser.avatar,
+              email: newuser.email,
+              _id: newuser._id,
             }))
             .catch((err) => {
               err.errorCode = 400;
               next(err);
             });
         })
-        .catch((err) => {
-          console.log('Обшибка: ' + err);
-          next(err);
-        });
+        .catch((err) => next(err));
     })
-    .catch((err) => {
-      console.log('Обшибка: ' + err);
-      next(err);
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -139,17 +131,15 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(res, next, email, password)
     .then((user) => {
       if (user) {
-        const token = jwt.sign({ _id: user._id }, 'secret-cat', { expiresIn: '7d' });
-        console.log(token);
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
         res
           .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
           .status(200).send({
-            "_id": user._id,
-            "name": user.name,
-            "about": user.about,
-            "avatar": user.avatar,
-            "email": user.email,
-            "__v": user.__v
+            _id: user._id,
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
           });
       }
     })

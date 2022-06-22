@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET } = require('../utils/utils');
 
 module.exports = (req, res, next) => {
-  const cookies = req.cookies;
-  console.log(cookies);
+  const { cookies } = req;
   if (!cookies) {
     const err = new Error('необходимо залогиниться');
     err.errorCode = 401;
@@ -15,8 +14,7 @@ module.exports = (req, res, next) => {
   const token = cookies.jwt;
   let payload;
   try {
-    payload = jwt.verify(token, 'secret-cat');
-    console.log(payload);
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     err.errorCode = 401;
     next(err);
@@ -24,4 +22,4 @@ module.exports = (req, res, next) => {
   }
   req.user = payload;
   next();
-}
+};
