@@ -6,8 +6,13 @@
       {
         "allow": [
           "_id"
-        ],
-        //"argsIgnorePattern": "^_"
+        ]
+      }
+    ],
+    "no-unused-vars": [
+      2,
+      {
+        "argsIgnorePattern": "^_"
       }
     ]
   }
