@@ -24,28 +24,23 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-/*app.use((req, _res, next) => {
-  req.user = {
-    _id: '629cc8283ee3bf44559a89e5',
-  };
-  next();
-});*/
-
-app.use('/signup', celebrate({
+app.use('/signup', /* celebrate({
   body: Joi.object().keys({
-    //email: Joi.string().required().email().min(2).max(30),
-    //password: Joi.string().required().min(2),
+    email: Joi.string().required().email().min(2)
+      .max(30),
+    password: Joi.string().required().min(2),
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
     about: Joi.string().min(2).max(30).default('Исследователь'),
     avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(urlRegExp),
-  })
-}), createUser);
-app.use('/signin', celebrate({
+  }),
+}), */ createUser);
+app.use('/signin', /* celebrate({
   body: Joi.object().keys({
-    //email: Joi.string().required().email().min(2).max(30),
-    //password: Joi.string().required().min(2),
-  })
-}), login);
+    email: Joi.string().required().email().min(2)
+      .max(30),
+    password: Joi.string().required().min(2),
+  }),
+}), */ login);
 
 app.use(auth);
 
