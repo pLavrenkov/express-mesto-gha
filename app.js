@@ -33,8 +33,8 @@ app.use(cookieParser());
 
 app.use('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().min(2).max(30),
-    password: Joi.string().required().min(2),
+    //email: Joi.string().required().email().min(2).max(30),
+    //password: Joi.string().required().min(2),
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
     about: Joi.string().min(2).max(30).default('Исследователь'),
     avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(urlRegExp),
@@ -42,8 +42,8 @@ app.use('/signup', celebrate({
 }), createUser);
 app.use('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().min(2).max(30),
-    password: Joi.string().required().min(2),
+    //email: Joi.string().required().email().min(2).max(30),
+    //password: Joi.string().required().min(2),
   })
 }), login);
 
