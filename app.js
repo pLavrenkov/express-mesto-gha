@@ -34,13 +34,12 @@ app.use('/signup', /* celebrate({
     avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(urlRegExp),
   }),
 }), */ createUser);
-app.use('/signin', /* celebrate({
+app.use('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().min(2)
-      .max(30),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(2),
   }),
-}), */ login);
+}), login);
 
 app.use(auth);
 
