@@ -2,14 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { errors } = require('celebrate');
+const { errors, celebrate, Joi } = require('celebrate');
+
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
 const {
   createUser,
   login,
 } = require('./controllers/users');
-const { handleCodeError } = require('./utils/utils');
+const { handleCodeError, urlRegExp } = require('./utils/utils');
 const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
@@ -30,8 +31,21 @@ app.use(cookieParser());
   next();
 });*/
 
-app.use('/signup', createUser);
-app.use('/signin', login);
+app.use('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email().min(2).max(30),
+    password: Joi.string().required().min(2),
+    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
+    about: Joi.string().min(2).max(30).default('Исследователь'),
+    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(urlRegExp),
+  })
+}), createUser);
+app.use('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email().min(2).max(30),
+    password: Joi.string().required().min(2),
+  })
+}), login);
 
 app.use(auth);
 

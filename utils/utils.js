@@ -45,3 +45,6 @@ module.exports.handleReqItemId = (item, res, next) => {
   return item;
   //res.send({ data: item });
 };
+
+module.exports.urlRegExp = new RegExp('^(https?:\/\/)(w{3}\.)?([a-zA-Zа-яА-Я\-\d]{2,256}\.)([a-zA-Zа-яА-Я]{2,6})(\/[\s^\/]+)*(#$)?');
+//module.exports = urlRegExp;
