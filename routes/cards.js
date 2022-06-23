@@ -7,7 +7,7 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
-const { urlRegExp } = require('../utils/utils');
+const { urlRegExp, idRegExp } = require('../utils/utils');
 
 router.get('/', getCards);
 router.post('/', celebrate({
@@ -18,17 +18,17 @@ router.post('/', celebrate({
 }), createCard);
 router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().pattern(idRegExp),
   }),
 }), deleteCard);
 router.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().pattern(idRegExp),
   }),
 }), likeCard);
 router.delete('/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24),
+    cardId: Joi.string().pattern(idRegExp),
   }),
 }), dislikeCard);
 

@@ -23,9 +23,10 @@ module.exports.getUser = (req, res, next) => {
       if (err.errorCode === 404) {
         next(err);
       }
-      err.message = 'некорректный id пользователя';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректный id пользователя';
+      error.errorCode = 400;
+      next(error);
     });
 };
 
@@ -39,9 +40,10 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (err.errorCode === 404) {
         next(err);
       }
-      err.message = 'некорректный id пользователя';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректный id пользователя';
+      error.errorCode = 400;
+      next(error);
     });
 };
 
@@ -82,8 +84,9 @@ module.exports.createUser = (req, res, next) => {
               _id: newuser._id,
             }))
             .catch((err) => {
-              err.errorCode = 400;
-              next(err);
+              const error = err;
+              error.errorCode = 400;
+              next(error);
             });
         })
         .catch((err) => next(err));
@@ -96,11 +99,12 @@ module.exports.updateUser = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        err.errorCode = 400;
-        next(err);
+      const error = err;
+      if (error.name === 'ValidationError') {
+        error.errorCode = 400;
+        next(error);
       }
-      next(err);
+      next(error);
     });
 };
 
@@ -109,11 +113,12 @@ module.exports.updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        err.errorCode = 400;
-        next(err);
+      const error = err;
+      if (error.name === 'ValidationError') {
+        error.errorCode = 400;
+        next(error);
       }
-      next(err);
+      next(error);
     });
 };
 

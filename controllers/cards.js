@@ -12,9 +12,10 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      err.message = 'некорректные данные о карточке';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректные данные о карточке';
+      error.errorCode = 400;
+      next(error);
     });
 };
 
@@ -34,15 +35,17 @@ module.exports.deleteCard = (req, res, next) => {
           res.send(cardn);
         })
         .catch((err) => {
-          err.message = 'некорректные данные о карточке';
-          err.errorCode = 400;
-          next(err);
+          const error = err;
+          error.message = 'некорректные данные о карточке';
+          error.errorCode = 400;
+          next(error);
         });
     })
     .catch((err) => {
-      err.message = 'некорректные данные о карточке';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректные данные о карточке';
+      error.errorCode = 400;
+      next(error);
     });
 };
 
@@ -57,9 +60,10 @@ module.exports.likeCard = (req, res, next) => {
       res.send(card);
     })
     .catch((err) => {
-      err.message = 'некорректные данные о карточке';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректные данные о карточке';
+      error.errorCode = 400;
+      next(error);
     });
 };
 
@@ -77,8 +81,9 @@ module.exports.dislikeCard = (req, res, next) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      err.message = 'некорректные данные о карточке';
-      err.errorCode = 400;
-      next(err);
+      const error = err;
+      error.message = 'некорректные данные о карточке';
+      error.errorCode = 400;
+      next(error);
     });
 };

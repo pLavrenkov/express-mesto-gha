@@ -9,17 +9,5 @@
         ]
       }
     ],
-    "no-unused-vars": [
-      2,
-      {
-        "argsIgnorePattern": "^_"
-      }
-    ],
-    "no-param-reassign": [
-      "error",
-      {
-        "props": false
-      }
-    ]
   }
 }

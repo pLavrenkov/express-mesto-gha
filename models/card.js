@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { urlRegExp } = require('../utils/utils');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -19,7 +20,7 @@ const cardSchema = new mongoose.Schema({
     required: [true, 'Отсутствует ID создателя карточки'],
   },
   likes: {
-    type: Array,
+    type: [mongoose.Schema.Types.ObjectId],
     default: [],
   },
   createdAt: {
@@ -27,5 +28,7 @@ const cardSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+cardSchema.path('link').validate((val) => urlRegExp.test(val), 'URL введен некорректно');
 
 module.exports = mongoose.model('card', cardSchema);

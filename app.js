@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(2),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
     about: Joi.string().min(2).max(30).default('Исследователь'),
     avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(urlRegExp),
@@ -36,7 +36,7 @@ app.use('/signup', celebrate({
 app.use('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(2),
+    password: Joi.string().required(),
   }),
 }), login);
 
@@ -46,7 +46,13 @@ app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
 
 app.use(errors());
-app.use((err, _req, res, _next) => handleCodeError(err, res));
-app.use((_req, res) => res.status(404).send({ message: 'Невозможно отобразить страницу' }));
+app.use((req, res, next) => {
+  const error = {
+    errorCode: 404,
+    message: 'Невозможно отобразить страницу',
+  };
+  next(error);
+});
+app.use((err, req, res, next) => handleCodeError(err, res, next));
 
 app.listen(PORT);
