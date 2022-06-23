@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { urlRegExp } = require('../utils/utils');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -39,6 +40,8 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
 });
+
+userSchema.path('avatar').validate((val) => urlRegExp.test(val), 'url введен некорректно');
 
 userSchema.statics.findUserByCredentials = function (res, next, email, password) {
   return this.findOne({ email })
