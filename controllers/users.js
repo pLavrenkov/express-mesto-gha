@@ -3,11 +3,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const { JWT_SECRET } = require('../utils/utils');
+const { JWT_SECRET, handleValidationError } = require('../utils/utils');
 const User = require('../models/user');
-const { handleReqItemId } = require('../utils/utils');
 const BadRequestError = require('../companents/BadRequestError');
 const ConflictError = require('../companents/ConflictError');
+const NotFoundError = require('../companents/NotFoundError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -17,49 +17,22 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      handleReqItemId(user, res, next);
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.statusCode === 404) {
-        next(err);
-      }
-      const error = new BadRequestError('некорректный ID пользователя');
-      next(error);
-    });
+    .orFail(new NotFoundError('пользователь не найден или удален'))
+    .then((user) => res.send(user))
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => {
-      handleReqItemId(user, res, next);
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.errorCode === 404) {
-        next(err);
-      }
-      const error = new BadRequestError('некорректный ID пользователя');
-      next(error);
-    });
+    .orFail(new NotFoundError('пользователь не найден или удален'))
+    .then((user) => res.send(user))
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  /* if (!password || !email) {
-    const err = new Error('email или пароль введен некорректно');
-    err.errorCode = 400;
-    next(err);
-    return;
-  } */
-  if (!validator.isEmail(email)) {
-    const err = new BadRequestError('Email введен некорректно');
-    next(err);
-    return;
-  }
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -79,7 +52,7 @@ module.exports.createUser = (req, res, next) => {
               email: newuser.email,
               _id: newuser._id,
             }))
-            .catch(next);
+            .catch((err) => handleValidationError(err, next));
         })
         .catch(next);
     })
@@ -90,26 +63,14 @@ module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        const error = new BadRequestError('введены некорректные данные');
-        next(error);
-      }
-      next(err);
-    });
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        const error = new BadRequestError('введены некорректные данные');
-        next(error);
-      }
-      next(err);
-    });
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.login = (req, res, next) => {

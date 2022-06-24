@@ -1,6 +1,6 @@
 const Card = require('../models/card');
-const { handleReqItemId } = require('../utils/utils');
-const BadRequestError = require('../companents/BadRequestError');
+const { handleReqItemId, handleValidationError } = require('../utils/utils');
+const NotFoundError = require('../companents/NotFoundError');
 const ForbiddenError = require('../companents/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
@@ -13,14 +13,12 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
-      next(error);
-    });
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
+    .orFail(new NotFoundError('карточка не найдена или удалена'))
     .then((card) => {
       handleReqItemId(card, res, next);
       if (card.owner.toString() !== req.user._id) {
@@ -29,14 +27,9 @@ module.exports.deleteCard = (req, res, next) => {
         return;
       }
       Card.findByIdAndRemove(req.params.cardId)
-        .then((cardn) => {
-          handleReqItemId(cardn, res, next);
-          res.send(cardn);
-        })
-        .catch((err) => {
-          const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
-          next(error);
-        });
+        .orFail(new NotFoundError('карточка не найдена или удалена'))
+        .then((cardn) => res.send(cardn))
+        .catch((err) => handleValidationError(err, next));
     })
     .catch(next);
 };
@@ -47,14 +40,9 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      handleReqItemId(card, res, next);
-      res.send(card);
-    })
-    .catch((err) => {
-      const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
-      next(error);
-    });
+    .orFail(new NotFoundError('карточка не найдена или удалена'))
+    .then((card) => res.send(card))
+    .catch((err) => handleValidationError(err, next));
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -63,12 +51,7 @@ module.exports.dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (card === null) {
-        handleReqItemId(card, res, next);
-        return;
-      }
-      res.status(200).send(card);
-    })
-    .catch(next);
+    .orFail(new NotFoundError('карточка не найдена или удалена'))
+    .then((card) => res.status(200).send(card))
+    .catch((err) => handleValidationError(err, next));
 };

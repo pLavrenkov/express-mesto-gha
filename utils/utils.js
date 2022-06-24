@@ -1,5 +1,5 @@
+const BadRequestError = require('../companents/BadRequestError');
 const InternalServerError = require('../companents/InternalServerError');
-const NotFoundError = require('../companents/NotFoundError');
 
 module.exports.handleError = (err, _req, res, next) => {
   if (!err.statusCode) {
@@ -9,12 +9,19 @@ module.exports.handleError = (err, _req, res, next) => {
   return next(res.status(err.statusCode).send({ message: err.message }));
 };
 
-module.exports.handleReqItemId = (item, res, next) => {
-  if (item !== null) {
-    return item;
+module.exports.handleValidationError = (err, next) => {
+  if (err.name === 'ValidationError') {
+    const error = new BadRequestError('некорректный запрос');
+    next(error);
+  } else if (err.name === 'CastError') {
+    const error = new BadRequestError('данные не найдены');
+    next(error);
+  } else if (err.statusCode === 400) {
+    const error = new BadRequestError('некорректный запрос');
+    next(error);
+  } else {
+    next(err);
   }
-  const err = new NotFoundError('объект с такими параметрами отсутствует или удален');
-  return next(err);
 };
 
 module.exports.urlRegExp = /^(https?:\/\/)(w{3}\\.)*([a-zA-Zа-яА-Я\-_\d]{2,256}\.)+([a-zA-Zа-яА-Я]{2,6})(\/?[\S]*)*?(#$)?/i;
