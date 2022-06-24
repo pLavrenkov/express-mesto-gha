@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { handleReqItemId, handleValidationError } = require('../utils/utils');
+const { handleValidationError } = require('../utils/utils');
 const NotFoundError = require('../companents/NotFoundError');
 const ForbiddenError = require('../companents/ForbiddenError');
 
@@ -20,7 +20,6 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .orFail(new NotFoundError('карточка не найдена или удалена'))
     .then((card) => {
-      handleReqItemId(card, res, next);
       if (card.owner.toString() !== req.user._id) {
         const err = new ForbiddenError('нельзя удалаять чужую карточку');
         next(err);
