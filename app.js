@@ -10,8 +10,9 @@ const {
   createUser,
   login,
 } = require('./controllers/users');
-const { handleCodeError, urlRegExp } = require('./utils/utils');
+const { handleError, urlRegExp } = require('./utils/utils');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./companents/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -45,14 +46,11 @@ app.use(auth);
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
 
-app.use(errors());
 app.use((req, res, next) => {
-  const error = {
-    errorCode: 404,
-    message: 'Невозможно отобразить страницу',
-  };
+  const error = new NotFoundError('Невозможно отобразить страницу');
   next(error);
 });
-app.use((err, req, res, next) => handleCodeError(err, res, next));
+app.use(errors());
+app.use((err, req, res, next) => handleError(err, req, res, next));
 
 app.listen(PORT);

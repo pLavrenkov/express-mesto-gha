@@ -1,5 +1,7 @@
 const Card = require('../models/card');
 const { handleReqItemId } = require('../utils/utils');
+const BadRequestError = require('../companents/BadRequestError');
+const ForbiddenError = require('../companents/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -12,9 +14,7 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      const error = err;
-      error.message = 'некорректные данные о карточке';
-      error.errorCode = 400;
+      const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
       next(error);
     });
 };
@@ -24,8 +24,7 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       handleReqItemId(card, res, next);
       if (card.owner.toString() !== req.user._id) {
-        const err = new Error('нельзя удалаять чужую карточку');
-        err.errorCode = 403;
+        const err = new ForbiddenError('нельзя удалаять чужую карточку');
         next(err);
         return;
       }
@@ -35,18 +34,11 @@ module.exports.deleteCard = (req, res, next) => {
           res.send(cardn);
         })
         .catch((err) => {
-          const error = err;
-          error.message = 'некорректные данные о карточке';
-          error.errorCode = 400;
+          const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
           next(error);
         });
     })
-    .catch((err) => {
-      const error = err;
-      error.message = 'некорректные данные о карточке';
-      error.errorCode = 400;
-      next(error);
-    });
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -60,9 +52,7 @@ module.exports.likeCard = (req, res, next) => {
       res.send(card);
     })
     .catch((err) => {
-      const error = err;
-      error.message = 'некорректные данные о карточке';
-      error.errorCode = 400;
+      const error = new BadRequestError(`некорректные данные о карточке: ${err.message}`);
       next(error);
     });
 };
@@ -80,10 +70,5 @@ module.exports.dislikeCard = (req, res, next) => {
       }
       res.status(200).send(card);
     })
-    .catch((err) => {
-      const error = err;
-      error.message = 'некорректные данные о карточке';
-      error.errorCode = 400;
-      next(error);
-    });
+    .catch(next);
 };

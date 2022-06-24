@@ -7,13 +7,13 @@ const {
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
-const { urlRegExp, idRegExp } = require('../utils/utils');
+const { urlRegExp } = require('../utils/utils');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().pattern(idRegExp),
+    userId: Joi.string().length(24).hex(),
   }),
 }), getUser);
 router.patch('/me', celebrate({

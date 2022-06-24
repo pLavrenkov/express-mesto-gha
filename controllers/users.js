@@ -6,6 +6,8 @@ require('dotenv').config();
 const { JWT_SECRET } = require('../utils/utils');
 const User = require('../models/user');
 const { handleReqItemId } = require('../utils/utils');
+const BadRequestError = require('../companents/BadRequestError');
+const ConflictError = require('../companents/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -20,12 +22,10 @@ module.exports.getUser = (req, res, next) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.errorCode === 404) {
+      if (err.statusCode === 404) {
         next(err);
       }
-      const error = err;
-      error.message = 'некорректный id пользователя';
-      error.errorCode = 400;
+      const error = new BadRequestError('некорректный ID пользователя');
       next(error);
     });
 };
@@ -40,9 +40,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (err.errorCode === 404) {
         next(err);
       }
-      const error = err;
-      error.message = 'некорректный id пользователя';
-      error.errorCode = 400;
+      const error = new BadRequestError('некорректный ID пользователя');
       next(error);
     });
 };
@@ -51,23 +49,21 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!password || !email) {
+  /* if (!password || !email) {
     const err = new Error('email или пароль введен некорректно');
     err.errorCode = 400;
     next(err);
     return;
-  }
-  if (!validator.isEmail(email) || !password || !email) {
-    const err = new Error('email введен некорректно');
-    err.errorCode = 400;
+  } */
+  if (!validator.isEmail(email)) {
+    const err = new BadRequestError('Email введен некорректно');
     next(err);
     return;
   }
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        const err = new Error(`пользователь с таким email: ${email}, уже существует`);
-        err.errorCode = 409;
+        const err = new ConflictError(`Пользователь с таким email: ${email}, уже существует`);
         next(err);
         return;
       }
@@ -83,15 +79,11 @@ module.exports.createUser = (req, res, next) => {
               email: newuser.email,
               _id: newuser._id,
             }))
-            .catch((err) => {
-              const error = err;
-              error.errorCode = 400;
-              next(error);
-            });
+            .catch(next);
         })
-        .catch((err) => next(err));
+        .catch(next);
     })
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -99,12 +91,11 @@ module.exports.updateUser = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
-      const error = err;
-      if (error.name === 'ValidationError') {
-        error.errorCode = 400;
+      if (err.name === 'ValidationError') {
+        const error = new BadRequestError('введены некорректные данные');
         next(error);
       }
-      next(error);
+      next(err);
     });
 };
 
@@ -113,24 +104,25 @@ module.exports.updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
-      const error = err;
-      if (error.name === 'ValidationError') {
-        error.errorCode = 400;
+      if (err.name === 'ValidationError') {
+        const error = new BadRequestError('введены некорректные данные');
         next(error);
       }
-      next(error);
+      next(err);
     });
 };
 
 module.exports.login = (req, res, next) => {
   const { password } = req.body;
   if (!req.body.email || !req.body.password) {
-    res.status(400).send({ message: 'Не заполнены email или пароль' });
+    const error = new BadRequestError('не заполнены email или пароль');
+    next(error);
     return;
   }
   const email = req.body.email.toLowerCase();
   if (!validator.isEmail(email)) {
-    res.status(400).send({ message: 'Email введен некорректно' });
+    const error = new BadRequestError('email введен некорректно');
+    next(error);
     return;
   }
   User.findUserByCredentials(res, next, email, password)

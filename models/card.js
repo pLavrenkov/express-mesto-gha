@@ -12,6 +12,12 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: [true, 'Не заполнен url карточки'],
+    validate: {
+      validator(val) {
+        return urlRegExp.test(val);
+      },
+      message: 'url введен некорректно',
+    },
     trim: true,
   },
   owner: {
@@ -20,7 +26,10 @@ const cardSchema = new mongoose.Schema({
     required: [true, 'Отсутствует ID создателя карточки'],
   },
   likes: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+    }],
     default: [],
   },
   createdAt: {
@@ -28,7 +37,5 @@ const cardSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-cardSchema.path('link').validate((val) => urlRegExp.test(val), 'URL введен некорректно');
 
 module.exports = mongoose.model('card', cardSchema);
