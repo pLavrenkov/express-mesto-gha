@@ -5,9 +5,9 @@ require('dotenv').config();
 
 const { JWT_SECRET, handleValidationError } = require('../utils/utils');
 const User = require('../models/user');
-const BadRequestError = require('../companents/BadRequestError');
-const ConflictError = require('../companents/ConflictError');
-const NotFoundError = require('../companents/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
+const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -98,6 +98,7 @@ module.exports.login = (req, res, next) => {
             about: user.about,
             avatar: user.avatar,
             email: user.email,
+            token,
           });
       }
     })

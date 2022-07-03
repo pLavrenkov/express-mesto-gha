@@ -12,7 +12,7 @@ const {
 } = require('./controllers/users');
 const { handleError, urlRegExp } = require('./utils/utils');
 const auth = require('./middlewares/auth');
-const NotFoundError = require('./companents/NotFoundError');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 

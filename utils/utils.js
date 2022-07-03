@@ -1,5 +1,5 @@
-const BadRequestError = require('../companents/BadRequestError');
-const InternalServerError = require('../companents/InternalServerError');
+const BadRequestError = require('../errors/BadRequestError');
+const InternalServerError = require('../errors/InternalServerError');
 
 module.exports.handleError = (err, _req, res, next) => {
   if (!err.statusCode) {
